@@ -25,6 +25,15 @@ class ElasticSearchInterface(IndexInterface):
             raise Exception("Index name not defined")
         return self._default_index
 
+    def clean_index(self, index_name):
+        index_name = self.get_index_name(index_name)
+        if not self.index_exists(index_name):
+            return
+        self._es.delete_by_query(
+            index=index_name, body={"query": {"match_all": {}}}, timeout="5m"
+        )
+        self._es.indices.refresh(index=index_name)
+
     def create_index(self, index_name: str = None, body: Dict = {}) -> None:
         index_name = self.get_index_name(index_name)
         if self.index_exists(index_name):
@@ -57,19 +66,19 @@ class ElasticSearchInterface(IndexInterface):
 
     def search(self, query: Dict, index: str = None) -> Dict:
         index = self.get_index_name(index)
-        result = self._es.search(index=index, body=query)
+        result = self._es.search(index=index, body=query, request_timeout=60)
         return result
 
     def paginated_search(
-        self, query: Dict, index: str = None, keep_alive: str = "1m"
+        self, query: Dict, index: str = None, keep_alive: str = "5m"
     ) -> Iterable[Dict]:
         index = self.get_index_name(index)
-        result = self._es.search(index=index, body=query, scroll=keep_alive)
+        result = self._es.search(index=index, body=query, scroll=keep_alive, request_timeout=60)
         yield result
 
-        scroll_id = result["_scroll_id"]
         while len(result["hits"]["hits"]) > 0:
-            result = self._es.scroll(scroll_id=scroll_id, scroll=keep_alive)
+            scroll_id = result["_scroll_id"]
+            result = self._es.scroll(scroll_id=scroll_id, scroll=keep_alive, request_timeout=60)
             yield result
         self._es.clear_scroll(scroll_id=scroll_id)
 

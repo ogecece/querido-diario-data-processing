@@ -61,23 +61,25 @@ def process_all():
     """
     enable_debug_if_necessary()
     database = create_database_interface()
-    storage = create_storage_interface()
+    # storage = create_storage_interface()
     index = create_index_interface()
-    text_extractor = create_apache_tika_text_extraction()
+    # text_extractor = create_apache_tika_text_extraction()
     gazettes_to_be_processed = get_all_gazettes_extracted(database)
-    indexed_gazettes = extract_text_from_gazettes(
-        gazettes_to_be_processed, storage, index, text_extractor
-    )
+    # indexed_gazettes = extract_text_from_gazettes(
+    #     gazettes_to_be_processed, storage, index, text_extractor
+    # )
     themes = get_themes()
     for theme in themes:
+        if theme["index"] != "educacao":
+            continue
         themed_excerpts = extract_themed_excerpts_from_gazettes(
-            theme, indexed_gazettes, index
+            theme, gazettes_to_be_processed, index
         )
-        embedding_reranked_excerpts = embedding_rerank_excerpts(
-            theme, themed_excerpts, index
-        )
-        tag_entities_in_excerpts(theme, embedding_reranked_excerpts, index)
-        tfidf_rerank_excerpts(theme, index)
+        # embedding_reranked_excerpts = embedding_rerank_excerpts(
+        #    theme, themed_excerpts, index
+        # )
+        # tag_entities_in_excerpts(theme, themed_excerpts, index)
+        # tfidf_rerank_excerpts(theme, index)
 
 
 def execute_pipeline():

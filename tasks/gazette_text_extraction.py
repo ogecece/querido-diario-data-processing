@@ -23,11 +23,12 @@ def extract_text_from_gazettes(
             processed_gazette = try_process_gazette_file(
                 gazette, storage, index, text_extractor
             )
-            yield processed_gazette
         except Exception as e:
             logging.warning(
                 f"Could not process gazette: {gazette['file_path']}. Cause: {e}"
             )
+        else:
+            yield processed_gazette
 
 
 def try_process_gazette_file(
@@ -40,11 +41,11 @@ def try_process_gazette_file(
     Do all the work to extract the content from the gazette files
     """
     logging.debug(f"Processing gazette {gazette['file_path']}")
-    gazette_file = download_gazette_file(gazette, storage)
-    get_gazette_text_and_define_url(gazette, gazette_file, text_extractor)
-    upload_gazette_raw_text(gazette, storage)
-    index.index_document(gazette, document_id=gazette["file_checksum"])
-    delete_gazette_files(gazette_file)
+    # gazette_file = download_gazette_file(gazette, storage)
+    # get_gazette_text_and_define_url(gazette, gazette_file, text_extractor)
+    # upload_gazette_raw_text(gazette, storage)
+    # index.index_document(gazette, document_id=gazette["file_checksum"])
+    # delete_gazette_files(gazette_file)
     return gazette
 
 
@@ -171,3 +172,13 @@ def get_gazette_file_key_used_in_storage(gazette) -> str:
     Get the file key used to store the gazette in the object storage
     """
     return gazette["file_path"]
+
+
+def set_gazette_as_processed(self, id: int, gazette_file_checksum: str) -> None:
+    logging.debug(f"Marking {id}({gazette_file_checksum}) as processed")
+    with self._connection.cursor() as cursor:
+        cursor.execute(
+            self.UPDATE_GAZETTE_AS_PROCESSED,
+            {"id": id, "file_checksum": gazette_file_checksum},
+        )
+        self._connection.commit()

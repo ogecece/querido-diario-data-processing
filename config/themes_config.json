@@ -152,6 +152,32 @@
           ]
         }
       ]
+    },
+    {
+      "name": "tecnologias remotas para educação",
+      "index": "educacao",
+      "stopwords": [],
+      "entities": {
+        "categories": [ ],
+        "cases": [ ]
+      },
+      "queries": [
+        {
+          "natural_language": "ensino remoto",
+          "term_sets": [
+            [["ambiente virtual de aprendizagem", "ava"], ["aplicativo", "plataforma"]],
+            [["ensino", "educação", "educacional"], ["aplicativo", "plataforma", "ambiente virtual"]],
+            [["ensino", "educação", "educacional"], ["aplicativo", "plataforma", "ambiente virtual"], ["em casa", "domiciliar", "à distância", "remota", "remoto", "virtual", "online", "on-line"]],
+            [["ensino", "educação", "educacional"], ["tablet", "mobile", "smartphone", "notebook", "celular", "computador", "chromebook"]],
+            [["ensino", "educação", "educacional"], ["internet", "dados", "3G", "4G", "5G", "banda larga"], ["vivo", "oi", "tim", "claro", "nextel", "correios", "telecom"]],
+            [["ensino", "educação", "educacional"], ["tplink", "intelbras"]],
+            [["ensino", "educação", "educacional"], ["internet móvel", "dados móveis", "3G", "4G", "5G", "via rádio", "banda larga", "fibra ótica", "satélite", "ADSL", "bluetooth"]],
+            [["ensino", "educação", "educacional"], ["superensino", "Eduedu", "eduplay", "Cogna", "lemann", "liber", "Brainy", "Stoodi", "ânima", "passei direto", "superprofgoogle", "microsoft"]],
+            [["ensino", "educação", "educacional"], ["classroom", "zoom", "youtube", "khan academy", "kahoot", "moodle", "office"]],
+            [["ensino", "educação", "educacional"], ["positivo", "lenovo", "samsung", "LG", "HP", "acer"]]
+          ]
+        }
+      ]
     }
   ]
 }

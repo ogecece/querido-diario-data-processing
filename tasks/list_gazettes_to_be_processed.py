@@ -68,6 +68,8 @@ def get_all_gazettes_extracted(
     FROM
         gazettes
     INNER JOIN territories ON territories.id = gazettes.territory_id
+    WHERE
+        processed is False
     ;
     """
     for gazette in database.select(command):
