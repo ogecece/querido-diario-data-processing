@@ -36,6 +36,7 @@ def create_xml_for_territory_and_year(territory_info:tuple, database, storage):
                                         ORDER BY date ASC;"))
 
         if len(query_content) > 0:
+            print(f"Gerando XML para cidade {territory_info[1]}-{territory_info[2]} no ano {year}")
             root = ET.Element("root")
             meta_info_tag = ET.SubElement(root, "meta")
             ET.SubElement(meta_info_tag, "localidade", name="municipio").text = territory_info[1]
@@ -44,7 +45,7 @@ def create_xml_for_territory_and_year(territory_info:tuple, database, storage):
             ET.SubElement(meta_info_tag, "ano").text = str(year)
             all_gazettes_tag = ET.SubElement(root, "diarios")  
 
-            path_xml = f"{territory_info[0]}/{year}/{territory_info[1]} - {territory_info[2]} - {year}.xml"
+            path_xml = f"{territory_info[0]}/{year}/{territory_info[1]}-{territory_info[2]}-{year}.xml"
 
             for gazette in query_content:
                 try:
@@ -54,15 +55,15 @@ def create_xml_for_territory_and_year(territory_info:tuple, database, storage):
                     storage.get_file(path_arq_bucket, file_gazette_txt)
 
                 except:
-                    print(f"Erro na obtenção do conteúdo de texto do diário de {territory_info[1]} - {territory_info[2]} - {gazette[2]}")
+                    print(f"Erro na obtenção do conteúdo de texto do diário de {territory_info[1]}-{territory_info[2]}-{gazette[2]}")
                     continue
 
                 gazette_tag = ET.SubElement(all_gazettes_tag, "gazette")
-                meta_gazette = ET.SubElement(gazette_tag, "meta")
-                ET.SubElement(meta_gazette, "URL_PDF").text = gazette[8]
+                meta_gazette = ET.SubElement(gazette_tag, "meta-gazette")
+                ET.SubElement(meta_gazette, "url_pdf").text = gazette[8]
                 ET.SubElement(meta_gazette, "poder").text = gazette[5]
-                ET.SubElement(meta_gazette, "ddicao_Extra").text = 'Sim' if gazette[4] else 'Não'
-                ET.SubElement(meta_gazette, "numero_Edicao").text = str(gazette[3]) if str(gazette[3]) is not None else "Não há"
+                ET.SubElement(meta_gazette, "edicao_extra").text = 'Sim' if gazette[4] else 'Não'
+                ET.SubElement(meta_gazette, "numero_edicao").text = str(gazette[3]) if str(gazette[3]) is not None else "Não há"
                 ET.SubElement(meta_gazette, "data_diario").text = datetime.strftime(gazette[2], "%d/%m")
                 ET.SubElement(gazette_tag, "conteudo").text = file_gazette_txt.getvalue().decode('utf-8')
 
