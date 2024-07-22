@@ -1,15 +1,15 @@
-from io import BytesIO
-from database import create_database_interface
-from storage import create_storage_interface
-import xml.etree.cElementTree as ET
 import traceback
+import xml.etree.cElementTree as ET
 from datetime import datetime
-from zipfile import ZipFile, ZIP_DEFLATED
-from utils.hash import hash_xml, hash_zip
+from io import BytesIO
 from xml.dom import minidom
+from zipfile import ZipFile, ZIP_DEFLATED
+
+from .utils import hash_xml, hash_zip
 
 
 need_update_zip_state = False
+
 
 def create_aggregates_table(database):
     database._commit_changes(
@@ -24,6 +24,7 @@ def create_aggregates_table(database):
             hash_info VARCHAR(64),
             file_size REAL
         ); """)
+
 
 def xml_content_generate(gazzetes_query_content:list, root, territory_id, storage):
     all_gazettes_tag = ET.SubElement(root, "diarios")
@@ -53,6 +54,7 @@ def xml_content_generate(gazzetes_query_content:list, root, territory_id, storag
         except:
             print(f"Erro na obtenção do conteúdo de texto do diário do territorio {territory_id}")
             continue
+
 
 def create_zip_for_state(xml_arr:list, year, state_code, database, storage):
     """
@@ -101,6 +103,7 @@ def create_zip_for_state(xml_arr:list, year, state_code, database, storage):
                 %(hash_info)s, %(file_size)s);", dict_query_info)
 
     zip_buffer.close()
+
 
 def create_zip_for_territory(xml_arr:list, database, storage):
     """
@@ -218,14 +221,11 @@ def create_aggregates_for_territories_and_states(territories_list:list, state, d
         
         xml_file.close()
 
-def create_aggregates():
+
+def create_aggregates(database, storage):
     """
     Create xml for all territories available in database
     """
-
-    database = create_database_interface()
-    storage = create_storage_interface()
-
     print("========== Script que agrega os arquivos .txt para .xml de territórios e estados ==========")
 
     results_query_states = database.select("SELECT DISTINCT state_code FROM territories ORDER BY state_code ASC;")
@@ -241,7 +241,3 @@ def create_aggregates():
         except:
             print(traceback.format_exc())
             continue
-
-
-if __name__ == "__main__":
-    create_aggregates()

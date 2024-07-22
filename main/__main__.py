@@ -1,4 +1,5 @@
 from os import environ
+import argparse
 import logging
 
 from data_extraction import create_apache_tika_text_extraction
@@ -6,6 +7,7 @@ from database import create_database_interface
 from storage import create_storage_interface
 from index import create_index_interface
 from tasks import (
+    create_aggregates,
     create_gazettes_index,
     create_themed_excerpts_index,
     embedding_rerank_excerpts,
@@ -35,9 +37,7 @@ def get_execution_mode():
     return environ.get("EXECUTION_MODE", "DAILY")
 
 
-def execute_pipeline():
-    enable_debug_if_necessary()
-
+def gazette_texts_pipeline():
     execution_mode = get_execution_mode()
     database = create_database_interface()
     storage = create_storage_interface()
@@ -61,5 +61,25 @@ def execute_pipeline():
         tag_entities_in_excerpts(theme, themed_excerpt_ids, index)
 
 
+def aggregates_pipeline():
+    database = create_database_interface()
+    storage = create_storage_interface()
+    create_aggregates(database, storage)
+
+
+def execute_pipeline(pipeline):
+    enable_debug_if_necessary()
+
+    if not pipeline or pipeline == "gazette_texts":
+        gazette_texts_pipeline()
+    elif pipeline == "aggregates":
+        aggregates_pipeline()
+    else:
+        raise ValueError("Pipeline inválido.")
+
+
 if __name__ == "__main__":
-    execute_pipeline()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-p", "--pipeline", help="Qual pipeline deve ser executado.")
+    args = parser.parse_args()
+    execute_pipeline(args.pipeline)

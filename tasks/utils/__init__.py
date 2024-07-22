@@ -15,4 +15,5 @@ from .territories import (
 )
 from .hash import (
     hash_xml,
+    hash_zip,
 )
